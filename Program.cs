@@ -8,7 +8,7 @@ builder.Services.AddControllersWithViews();
 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.useInMemoryDatabase("PhoneBook"));
+    options.UseInMemoryDatabase("PhoneBook"));
 
 
 builder.Services.AddScoped<IContactService, ContactService>();
