@@ -1,0 +1,217 @@
+@model IEnumerable<Contact>
+@{
+    ViewData["Title"] = "Контакты";
+    var searchName  = ViewBag.SearchName as string;
+    var message     = ViewBag.Message    as string;
+    var messageType = ViewBag.MessageType as string ?? "success";
+}
+
+<style>
+    /* ── SEARCH BAR ── */
+    .search-bar {
+        display: flex;
+        gap: .75rem;
+        margin-bottom: 2rem;
+        align-items: center;
+    }
+    .search-bar input[type="text"] {
+        flex: 1;
+        max-width: 360px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        color: var(--text);
+        font-family: var(--mono);
+        font-size: 13px;
+        padding: .55rem .9rem;
+        outline: none;
+        transition: border-color .15s;
+    }
+    .search-bar input[type="text"]::placeholder { color: var(--muted); }
+    .search-bar input[type="text"]:focus { border-color: var(--accent); }
+
+    .btn {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: .55rem 1.1rem;
+        border-radius: var(--radius);
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        transition: opacity .15s, background .15s;
+    }
+    .btn-primary  { background: var(--accent);  color: #000; font-weight: 600; }
+    .btn-ghost    { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+    .btn-danger   { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: .3rem .7rem; font-size: 11px; }
+    .btn-edit     { background: transparent; border: 1px solid var(--accent2); color: var(--accent2); padding: .3rem .7rem; font-size: 11px; }
+    .btn:hover    { opacity: .85; }
+
+    /* ── BADGE ── */
+    .search-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        background: color-mix(in srgb, var(--accent2) 15%, var(--surface));
+        border: 1px solid var(--accent2);
+        border-radius: 20px;
+        padding: .25rem .75rem;
+        font-size: 12px;
+        color: var(--text);
+        margin-bottom: 1.2rem;
+    }
+    .search-badge a { color: var(--muted); text-decoration: none; margin-left: .3rem; }
+    .search-badge a:hover { color: var(--danger); }
+
+    /* ── TABLE ── */
+    .table-wrap {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    thead tr {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+    }
+    thead th {
+        padding: .75rem 1rem;
+        text-align: left;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 400;
+    }
+    tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background .1s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: color-mix(in srgb, var(--accent) 4%, var(--bg)); }
+    tbody td {
+        padding: .8rem 1rem;
+        font-size: 13px;
+        vertical-align: middle;
+    }
+    .td-name  { color: var(--text); font-weight: 600; }
+    .td-phone { color: var(--accent); font-family: var(--mono); }
+    .td-email { color: var(--muted); }
+    .td-email a { color: var(--muted); text-decoration: none; }
+    .td-email a:hover { color: var(--text); }
+
+    /* ── EMPTY ── */
+    .empty {
+        padding: 3rem 1rem;
+        text-align: center;
+        color: var(--muted);
+    }
+    .empty span { font-size: 2rem; display: block; margin-bottom: .75rem; }
+
+    /* ── STATS ── */
+    .stats {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 1rem;
+        letter-spacing: 0.04em;
+    }
+</style>
+
+<h1>Телефонный справочник</h1>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert @(messageType == "error" ? "alert-error" : "")">@message</div>
+}
+
+<!-- Поиск -->
+<div class="search-bar">
+    <form method="get" action="/Contacts/Search" style="display:flex;gap:.75rem;align-items:center;">
+        <input type="text" name="name" placeholder="Поиск по имени…"
+               value="@searchName" />
+        <button type="submit" class="btn btn-primary">Найти</button>
+    </form>
+    @if (!string.IsNullOrEmpty(searchName))
+    {
+        <a asp-action="Index" class="btn btn-ghost">Сбросить</a>
+    }
+</div>
+
+@if (!string.IsNullOrEmpty(searchName))
+{
+    <div class="search-badge">
+        🔍 Поиск: «<strong>@searchName</strong>»
+        <a asp-action="Index" title="Сбросить">✕</a>
+    </div>
+}
+
+<!-- Статистика -->
+<div class="stats">Найдено записей: @Model.Count()</div>
+
+<!-- Таблица контактов -->
+@if (Model.Any())
+{
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Имя</th>
+                    <th>Телефон</th>
+                    <th>Email</th>
+                    <th>Id</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int i = 1; }
+                @foreach (var contact in Model)
+                {
+                    <tr>
+                        <td class="td-muted" style="color:var(--muted);width:48px;">@(i++)</td>
+                        <td class="td-name">@contact.Name</td>
+                        <td class="td-phone">@contact.PhoneNumber</td>
+                        <td class="td-email">
+                            @if (!string.IsNullOrEmpty(contact.Email))
+                            {
+                                <a href="mailto:@contact.Email">@contact.Email</a>
+                            }
+                            else
+                            {
+                                <span style="color:var(--border)">—</span>
+                            }
+                        </td>
+                        <td style="color:var(--muted);font-size:11px;width:48px;">@contact.Id</td>
+                        <td style="text-align:right;white-space:nowrap;">
+                            <a asp-action="Edit" asp-route-id="@contact.Id" class="btn btn-edit">Изменить</a>
+                            <form asp-action="Delete" asp-route-id="@contact.Id" method="post"
+                                  style="display:inline;margin-left:.4rem;"
+                                  onsubmit="return confirm('Удалить «@contact.Name»?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger">Удалить</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="empty">
+        <span>🔍</span>
+        @if (!string.IsNullOrEmpty(searchName))
+        {
+            <text>Контакты с именем «@searchName» не найдены.</text>
+        }
+        else
+        {
+            <text>Контакты отсутствуют. <a asp-action="Create" style="color:var(--accent)">Добавьте первый!</a></text>
+        }
+    </div>
+}

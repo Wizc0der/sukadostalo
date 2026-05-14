@@ -1,0 +1,171 @@
+@model ContactViewModel
+@{
+    ViewData["Title"] = "Редактировать контакт";
+    var contactId   = (int)ViewBag.ContactId;
+    var message     = ViewBag.Message     as string;
+    var messageType = ViewBag.MessageType as string ?? "success";
+}
+
+<style>
+    .form-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 2rem;
+        max-width: 520px;
+    }
+
+    .form-section-title {
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent2);
+        margin: 1.5rem 0 1rem;
+        padding-bottom: .4rem;
+        border-bottom: 1px solid var(--border);
+    }
+    .form-section-title:first-child { margin-top: 0; }
+
+    .form-group { margin-bottom: 1.1rem; }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .75rem;
+    }
+
+    label {
+        display: block;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: .4rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"] {
+        width: 100%;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        color: var(--text);
+        font-family: var(--mono);
+        font-size: 14px;
+        padding: .6rem .85rem;
+        outline: none;
+        transition: border-color .15s, box-shadow .15s;
+    }
+    input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+    }
+    input.input-error { border-color: var(--danger); }
+
+    .field-validation-error {
+        display: block;
+        color: var(--danger);
+        font-size: 11px;
+        margin-top: .3rem;
+    }
+
+    .btn {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: .65rem 1.4rem;
+        border-radius: var(--radius);
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        transition: opacity .15s;
+        display: inline-block;
+    }
+    .btn-primary { background: var(--accent);  color: #000; font-weight: 700; }
+    .btn-ghost   { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+    .btn:hover   { opacity: .8; }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-top: 1.75rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .id-badge {
+        display: inline-block;
+        background: color-mix(in srgb, var(--accent2) 12%, var(--surface));
+        border: 1px solid var(--accent2);
+        border-radius: 4px;
+        padding: .2rem .6rem;
+        font-size: 11px;
+        color: var(--accent2);
+        margin-left: .5rem;
+        vertical-align: middle;
+    }
+
+    .required { color: var(--accent); }
+</style>
+
+<h1>Редактировать контакт <span class="id-badge">ID: @contactId</span></h1>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert @(messageType == "error" ? "alert-error" : "")">@message</div>
+}
+
+<div class="form-card">
+    <form asp-action="Edit" asp-route-id="@contactId" method="post">
+        @Html.AntiForgeryToken()
+
+        <!-- ── ФИО ──────────────────────────────────────────────── -->
+        <div class="form-section-title">ФИО</div>
+
+        <div class="form-group">
+            <label asp-for="LastName">Фамилия <span class="required">*</span></label>
+            <input asp-for="LastName" type="text" placeholder="Иванов"
+                   class="@(ViewData.ModelState["LastName"]?.Errors.Count > 0 ? "input-error" : "")" />
+            <span asp-validation-for="LastName" class="field-validation-error"></span>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label asp-for="FirstName">Имя <span class="required">*</span></label>
+                <input asp-for="FirstName" type="text" placeholder="Иван"
+                       class="@(ViewData.ModelState["FirstName"]?.Errors.Count > 0 ? "input-error" : "")" />
+                <span asp-validation-for="FirstName" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="MiddleName">Отчество</label>
+                <input asp-for="MiddleName" type="text" placeholder="Иванович" />
+            </div>
+        </div>
+
+        <!-- ── Контактные данные ─────────────────────────────────── -->
+        <div class="form-section-title">Контактные данные</div>
+
+        <div class="form-group">
+            <label asp-for="PhoneNumber">Телефон <span class="required">*</span></label>
+            <input asp-for="PhoneNumber" type="tel" placeholder="+7 (999) 000-00-00"
+                   class="@(ViewData.ModelState["PhoneNumber"]?.Errors.Count > 0 ? "input-error" : "")" />
+            <span asp-validation-for="PhoneNumber" class="field-validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email">Email <span class="required">*</span></label>
+            <input asp-for="Email" type="email" placeholder="ivan@example.com"
+                   class="@(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "input-error" : "")" />
+            <span asp-validation-for="Email" class="field-validation-error"></span>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">✏ Сохранить изменения</button>
+            <a asp-action="Index" class="btn btn-ghost">Отмена</a>
+        </div>
+    </form>
+</div>

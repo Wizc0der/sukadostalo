@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — PhoneBook</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:        #0d0d0f;
+            --surface:   #16161a;
+            --border:    #2a2a35;
+            --accent:    #00e5a0;
+            --accent2:   #7b5ea7;
+            --text:      #e8e8f0;
+            --muted:     #6e6e85;
+            --danger:    #ff4f6a;
+            --radius:    6px;
+            --mono:      'IBM Plex Mono', monospace;
+            --display:   'Unbounded', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+        /* ── NAV ── */
+        nav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            height: 56px;
+        }
+        nav .brand {
+            font-family: var(--display);
+            font-weight: 900;
+            font-size: 1rem;
+            color: var(--accent);
+            letter-spacing: -0.02em;
+            text-decoration: none;
+        }
+        nav a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: color .15s;
+        }
+        nav a:hover { color: var(--text); }
+
+        /* ── MAIN ── */
+        main {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+        }
+
+        h1 {
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        /* ── ALERTS ── */
+        .alert {
+            padding: .75rem 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            font-size: 13px;
+            border-left: 3px solid var(--accent);
+            background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+            color: var(--text);
+        }
+
+        .alert-error {
+            border-left-color: var(--danger);
+            background: color-mix(in srgb, var(--danger) 8%, var(--surface));
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--muted);
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a class="brand" asp-controller="Contacts" asp-action="Index">📒 PHONEBOOK</a>
+        <a asp-controller="Contacts" asp-action="Index">Все контакты</a>
+        <a asp-controller="Contacts" asp-action="Create">+ Добавить</a>
+    </nav>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer>PhoneBook · ASP.NET Core @System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription</footer>
+</body>
+</html>
